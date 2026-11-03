@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Chiefs &amp; NFL</title>
+    <meta name="description" content="Simple Kansas City Chiefs and NFL wins, losses, and weekly schedule." />
+
+    <!-- iOS / iPadOS Standalone Home Screen Native Mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chiefs &amp; NFL" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#C8102E" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Sticky Header -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="today-banner">
+          <span id="today-date-text">Today</span>
+          <span id="update-status-text">Loading live NFL data…</span>
+        </div>
+        <div class="header-main">
+          <div class="brand-group">
+            <img
+              class="brand-logo"
+              src="https://a.espncdn.com/i/teamlogos/nfl/500/kc.png"
+              alt="KC"
+              onerror="this.src='./icons/icon-180.png'"
+            />
+            <div>
+              <h1 class="brand-title">Kansas City Chiefs &amp; NFL</h1>
+              <p class="brand-subtitle">Wins, Losses &amp; Weekly Schedule</p>
+            </div>
+          </div>
+          <div class="header-controls">
+            <button id="text-size-btn" class="ctrl-btn" type="button" onclick="toggleTextSize()">
+              Bigger Text (A+)
+            </button>
+            <button class="ctrl-btn" type="button" onclick="refreshAllData(false)">
+              ↻ Refresh
+            </button>
+            <button id="install-help-btn" class="ctrl-btn" type="button" onclick="openInstallModal()">
+              📲 iPhone/iPad Setup
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Panels -->
+    <main class="app-main">
+      <!-- PANEL 1: MY CHIEFS -->
+      <section id="panel-chiefs" class="tab-panel active" aria-label="My Chiefs">
+        <div id="chiefs-content"></div>
+      </section>
+
+      <!-- PANEL 2: ALL TEAMS WINS & LOSSES -->
+      <section id="panel-standings" class="tab-panel" aria-label="Team Wins and Losses">
+        <div class="section-header" style="margin-top: 4px;">
+          <h2 class="section-title">How All NFL Teams Are Doing</h2>
+          <p class="section-subtitle">Tap a button below to view by Division or Best Record</p>
+        </div>
+        <div id="standings-filter-bar" class="filter-bar">
+          <button
+            class="filter-btn active"
+            type="button"
+            data-filter="divisions"
+            onclick="setStandingsFilter('divisions')"
+          >
+            By Division (Chiefs First)
+          </button>
+          <button
+            class="filter-btn"
+            type="button"
+            data-filter="overall"
+            onclick="setStandingsFilter('overall')"
+          >
+            Best Record (All 32 Teams)
+          </button>
+          <button
+            class="filter-btn"
+            type="button"
+            data-filter="afc"
+            onclick="setStandingsFilter('afc')"
+          >
+            AFC Teams Only
+          </button>
+          <button
+            class="filter-btn"
+            type="button"
+            data-filter="nfc"
+            onclick="setStandingsFilter('nfc')"
+          >
+            NFC Teams Only
+          </button>
+        </div>
+        <div id="standings-content"></div>
+      </section>
+
+      <!-- PANEL 3: NFL SCHEDULE BY WEEK -->
+      <section id="panel-schedule" class="tab-panel" aria-label="NFL Schedule by Week">
+        <div class="section-header" style="margin-top: 4px;">
+          <h2 class="section-title">NFL Schedule &amp; Scores by Week</h2>
+          <p class="section-subtitle">Use the buttons below to look at any week</p>
+        </div>
+        <div id="week-nav-container"></div>
+        <div id="weekly-games-container"></div>
+      </section>
+    </main>
+
+    <!-- Giant 3-Button Bottom Navigation Bar -->
+    <nav class="bottom-nav" aria-label="Main Navigation">
+      <div class="bottom-nav-inner">
+        <button
+          class="nav-tab-btn active"
+          type="button"
+          data-tab="chiefs"
+          onclick="switchTab('chiefs')"
+        >
+          <span class="nav-tab-icon">🏈</span>
+          <span class="nav-tab-label">My Chiefs</span>
+        </button>
+        <button
+          class="nav-tab-btn"
+          type="button"
+          data-tab="standings"
+          onclick="switchTab('standings')"
+        >
+          <span class="nav-tab-icon">📊</span>
+          <span class="nav-tab-label">Team Wins &amp; Losses</span>
+        </button>
+        <button
+          class="nav-tab-btn"
+          type="button"
+          data-tab="schedule"
+          onclick="switchTab('schedule')"
+        >
+          <span class="nav-tab-icon">📅</span>
+          <span class="nav-tab-label">NFL by Week</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- One-time Setup Modal for Kirk (Hidden automatically once installed on Home Screen) -->
+    <div id="install-modal" class="modal-backdrop" onclick="if(event.target===this)closeInstallModal()">
+      <div class="modal-box">
+        <h2>📲 Put This on Mom's iPhone &amp; iPad Home Screen</h2>
+        <p style="font-weight: 700; margin-top: 0;">
+          Once added to her Home Screen, this app opens in 100% full-screen native mode with NO Safari address bar, NO tabs, and NO links she can get lost in:
+        </p>
+        <ol>
+          <li>Open this link in <strong>Safari</strong> on her iPhone or iPad.</li>
+          <li>Tap the <strong>Share</strong> button (the square with an arrow pointing up <strong>[↑]</strong> at the bottom on iPhone, or top-right on iPad).</li>
+          <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+          <li>Tap <strong>"Add"</strong> in the top-right corner.</li>
+          <li>Drag the new red &amp; gold <strong>Chiefs &amp; NFL</strong> icon right into her bottom Dock so it's always in the same spot!</li>
+        </ol>
+        <button class="modal-close-btn" type="button" onclick="closeInstallModal()">
+          Got It — Close
+        </button>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
